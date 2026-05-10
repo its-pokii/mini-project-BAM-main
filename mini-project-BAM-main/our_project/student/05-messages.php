@@ -174,7 +174,7 @@ function renderConvos() {
                 ${c.user_id == selectedConvo ? 'bg-blue-50' : 'hover:bg-gray-50'}">
 
       ${c.profile_photo
-        ? `<img src="../uploads/${escapeHTML(c.profile_photo)}" class="w-10 h-10 rounded-full object-cover"/>`
+        ? `<img src="${escapeHTML(c.profile_photo)}" class="w-10 h-10 rounded-full object-cover"/>`
         : `<div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
                 style="background:${getColor(i)}">
              ${initials(c.first_name + ' ' + c.last_name)}
@@ -220,7 +220,7 @@ function selectConvo(userId, colorIndex) {
   const avatar = document.getElementById('chatAvatar');
 
   if (c.profile_photo) {
-    avatar.innerHTML = `<img src="../uploads/${escapeHTML(c.profile_photo)}" class="w-10 h-10 rounded-full object-cover"/>`;
+    avatar.innerHTML = `<img src="${escapeHTML(c.profile_photo)}" class="w-10 h-10 rounded-full object-cover"/>`;
     avatar.style.background = 'transparent';
   } else {
     avatar.textContent = initials(c.first_name + ' ' + c.last_name);

@@ -77,7 +77,7 @@ function initials(name) {
 
 function avatarHTML(user, index) {
   return user.profile_photo
-    ? `<img src="../uploads/${user.profile_photo}" 
+    ? `<img src="${user.profile_photo}" 
             class="w-12 h-12 rounded-full object-cover flex-shrink-0" />`
     : `<div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-base flex-shrink-0"
              style="background:${colors[index % colors.length]}">

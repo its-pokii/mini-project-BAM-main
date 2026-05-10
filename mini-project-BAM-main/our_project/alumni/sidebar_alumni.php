@@ -13,14 +13,6 @@ if (!empty($_photo_raw)) {
 ?>
 <aside class="w-[220px] shrink-0 bg-white border-r border-gray-200 flex flex-col h-full">
 
-    <!-- Logo -->
-    <div class="h-16 flex items-center gap-2.5 px-5 border-b border-gray-100">
-        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <i data-lucide="zap" class="w-4 h-4 text-white fill-white"></i>
-        </div>
-        <span class="font-bold text-gray-900 text-[15px] tracking-tight">UCA Connect</span>
-    </div>
-
     <!-- Nav -->
     <nav class="flex-1 p-3 flex flex-col gap-0.5 overflow-y-auto">
         <a href="dashboard_alumni.php" class="nav-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard_alumni.php' ? 'active' : '' ?> flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600">
@@ -47,7 +39,7 @@ if (!empty($_photo_raw)) {
 
     <!-- Bottom: Profile & Settings + User Card -->
     <div class="p-3 border-t border-gray-100">
-        <a href="profile.php" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600">
+        <a href="alumni_settings.php" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-600">
             <i data-lucide="settings" class="w-4 h-4 shrink-0"></i> Profile & Settings
         </a>
 

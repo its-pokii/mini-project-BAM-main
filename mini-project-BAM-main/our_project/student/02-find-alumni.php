@@ -35,7 +35,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
         <a href="05-messages.php"    class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-900 border-r-4 border-transparent hover:bg-gray-100 no-underline transition-colors">Messages</a>
         <a href="06-stories.php"     class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-900 border-r-4 border-transparent hover:bg-gray-100 no-underline transition-colors">Stories</a>
       </nav>
-      <a href="settings.php" class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-500 no-underline">⚙️ Profile &amp; Settings</a>
+      <a href="settings.php" class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-500 no-underline">Profile &amp; Settings</a>
     </div>
 
     <!-- MAIN -->
@@ -43,7 +43,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
 
       <!-- FILTER BOX -->
       <div class="bg-white border border-gray-200 rounded-xl p-5 mb-6">
-        <div class="font-semibold mb-3">🔽 Filter Alumni</div>
+        <div class="font-semibold mb-3">Filter Alumni</div>
         <input
           type="text"
           id="searchInput"

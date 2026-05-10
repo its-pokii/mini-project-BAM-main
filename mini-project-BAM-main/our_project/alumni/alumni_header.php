@@ -11,7 +11,7 @@
       <div class="flex items-center gap-2">
         <?php if (!empty($user['profile_photo'])): ?>
     <img 
-        src="<?= htmlspecialchars($user['profile_photo']) ?>"
+        src="../student/<?= htmlspecialchars($user['profile_photo']) ?>"
         alt="Profile Photo"
         class="w-12 h-12 rounded-full object-cover"
     />

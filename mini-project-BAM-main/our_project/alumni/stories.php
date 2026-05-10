@@ -1,7 +1,11 @@
 <?php
+include("../student/tools/userHeaderName.php"); 
+?>
+
+
+<?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-session_start();
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'alumni') {
     header("Location: ../login.php");
@@ -11,7 +15,16 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'alumni') {
 require_once("../auth/config.php");
 $user_id = $_SESSION['user_id'];
 
-// Alumni info (for sidebar/topbar)
+if (isset($_GET['delete_id'])) {
+    $del_id = (int)$_GET['delete_id'];
+    $stmt_del = $connector->prepare("DELETE FROM success_stories WHERE id = ? AND author_id = ?");
+    $stmt_del->bind_param('ii', $del_id, $user_id);
+    $stmt_del->execute();
+    $stmt_del->close();
+    header("Location: stories.php");
+    exit;
+}
+
 $stmt = $connector->prepare("
     SELECT u.first_name, u.last_name, u.profile_photo, ap.current_position, ap.current_company 
     FROM users u LEFT JOIN alumni_profiles ap ON u.id = ap.user_id WHERE u.id = ?
@@ -20,34 +33,30 @@ $stmt->bind_param('i', $user_id); $stmt->execute();
 $stmt->bind_result($first_name, $last_name, $profile_photo, $job_title, $company);
 $stmt->fetch(); $stmt->close();
 
-// Sidebar badge counts
 $stmt2 = $connector->prepare("SELECT COUNT(*) FROM connection_requests WHERE alumni_id = ? AND status = 'pending'");
 $stmt2->bind_param('i', $user_id); $stmt2->execute(); $stmt2->bind_result($pending_count); $stmt2->fetch(); $stmt2->close();
 
 $stmt3 = $connector->prepare("SELECT COUNT(*) FROM messages WHERE receiver_id = ? AND is_read = 0");
 $stmt3->bind_param('i', $user_id); $stmt3->execute(); $stmt3->bind_result($unread_count); $stmt3->fetch(); $stmt3->close();
 
-// All stories for this alumni
 $stories = [];
-// $stmt4 = $connector->prepare("
-//     SELECT id, title, content, status, views, created_at, updated_at
-//     FROM stories
-//     WHERE alumni_id = ?
-//     ORDER BY created_at DESC
-// ");
-// $stmt4->bind_param('i', $user_id); $stmt4->execute();
-// $res = $stmt4->get_result();
-// while ($row = $res->fetch_assoc()) $stories[] = $row;
-// $stmt4->close();
+$stmt4 = $connector->prepare("
+    SELECT id, title, content, status, created_at, approved_at
+    FROM success_stories
+    WHERE author_id = ?
+    ORDER BY created_at DESC
+");
+$stmt4->bind_param('i', $user_id); $stmt4->execute();
+$res = $stmt4->get_result();
+while ($row = $res->fetch_assoc()) $stories[] = $row;
+$stmt4->close();
 
-// Count by status
-$counts = ['published' => 0, 'pending' => 0, 'draft' => 0, 'rejected' => 0];
+$counts = ['approved' => 0, 'pending' => 0, 'rejected' => 0];
 foreach ($stories as $s) {
-    $st = strtolower($s['status'] ?? 'draft');
+    $st = strtolower($s['status'] ?? 'pending');
     if (isset($counts[$st])) $counts[$st]++;
 }
 
-// Format vars for sidebar/topbar
 $full_name     = htmlspecialchars(($first_name ?? 'Alumni') . ' ' . ($last_name ?? ''));
 $first_only    = htmlspecialchars($first_name ?? 'Alumni');
 $avatar_letter = strtoupper(substr($first_name ?? 'A', 0, 1));
@@ -55,14 +64,12 @@ $display_photo = $profile_photo ?? '';
 $pending_count = (int)($pending_count ?? 0);
 $unread_count  = (int)($unread_count  ?? 0);
 
-// Status badge style helper
 function status_badge($status) {
     return match(strtolower($status)) {
-        'published' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-        'pending'   => 'bg-amber-50 text-amber-700 border border-amber-200',
-        'draft'     => 'bg-gray-100 text-gray-600 border border-gray-200',
-        'rejected'  => 'bg-red-50 text-red-600 border border-red-200',
-        default     => 'bg-gray-100 text-gray-500 border border-gray-200',
+        'approved' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+        'pending'  => 'bg-amber-50 text-amber-700 border border-amber-200',
+        'rejected' => 'bg-red-50 text-red-600 border border-red-200',
+        default    => 'bg-gray-100 text-gray-500 border border-gray-200',
     };
 }
 ?>
@@ -89,11 +96,13 @@ function status_badge($status) {
     .fade-up { animation: fadeUp .3s ease both; }
 </style>
 
-<div class="flex h-screen overflow-hidden bg-[#f5f6fa]">
-    <?php include 'sidebar_alumni.php'; ?>
+<div class="flex flex-col h-screen overflow-hidden bg-[#f5f6fa]">
 
-    <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <?php include 'Topbar_alumni.php'; ?>
+    <?php include 'alumni_header.php'; ?>
+
+    <div class="flex flex-1 overflow-hidden">
+
+        <?php include 'sidebar_alumni.php'; ?>
 
         <div class="flex-1 overflow-y-auto">
             <div class="px-8 py-7 max-w-5xl mx-auto space-y-6">
@@ -116,17 +125,13 @@ function status_badge($status) {
                             class="tab-btn active px-4 py-2.5 text-sm text-gray-600">
                         All <span class="ml-1 text-xs font-bold text-gray-400"><?= count($stories) ?></span>
                     </button>
-                    <button onclick="filterStories('published')" id="tab-published"
+                    <button onclick="filterStories('approved')" id="tab-approved"
                             class="tab-btn px-4 py-2.5 text-sm text-gray-600">
-                        Published <span class="ml-1 text-xs font-bold text-emerald-600"><?= $counts['published'] ?></span>
+                        Approved <span class="ml-1 text-xs font-bold text-emerald-600"><?= $counts['approved'] ?></span>
                     </button>
                     <button onclick="filterStories('pending')" id="tab-pending"
                             class="tab-btn px-4 py-2.5 text-sm text-gray-600">
-                        Pending Approval <span class="ml-1 text-xs font-bold text-amber-600"><?= $counts['pending'] ?></span>
-                    </button>
-                    <button onclick="filterStories('draft')" id="tab-draft"
-                            class="tab-btn px-4 py-2.5 text-sm text-gray-600">
-                        Drafts <span class="ml-1 text-xs font-bold text-gray-400"><?= $counts['draft'] ?></span>
+                        Pending <span class="ml-1 text-xs font-bold text-amber-600"><?= $counts['pending'] ?></span>
                     </button>
                     <button onclick="filterStories('rejected')" id="tab-rejected"
                             class="tab-btn px-4 py-2.5 text-sm text-gray-600">
@@ -169,7 +174,7 @@ function status_badge($status) {
                     <div id="stories-list">
                         <?php foreach ($stories as $i => $story):
                             $excerpt = htmlspecialchars(substr(strip_tags($story['content'] ?? ''), 0, 120));
-                            $status = strtolower($story['status'] ?? 'draft');
+                            $status  = strtolower($story['status'] ?? 'pending');
                             $badge   = status_badge($status);
                             $date    = date('Y-m-d', strtotime($story['created_at']));
                         ?>
@@ -198,16 +203,6 @@ function status_badge($status) {
 
                             <!-- Actions -->
                             <div class="flex items-center justify-end gap-1 pt-0.5">
-                                <a href="edit-story.php?id=<?= (int)$story['id'] ?>"
-                                   title="Edit"
-                                   class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
-                                    <i data-lucide="pencil" class="w-4 h-4"></i>
-                                </a>
-                                <a href="view-story.php?id=<?= (int)$story['id'] ?>"
-                                   title="View"
-                                   class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors">
-                                    <i data-lucide="eye" class="w-4 h-4"></i>
-                                </a>
                                 <button onclick="confirmDelete(<?= (int)$story['id'] ?>)"
                                         title="Delete"
                                         class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
@@ -229,7 +224,9 @@ function status_badge($status) {
                 <p class="text-xs text-gray-300">Alumni Portal</p>
             </footer>
         </div>
+
     </div>
+
 </div>
 
 <!-- Delete confirm modal -->
@@ -244,13 +241,11 @@ function status_badge($status) {
             <button onclick="closeDelete()" class="flex-1 py-2 text-sm font-semibold border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors">
                 Cancel
             </button>
-            <form method="POST" action="story-handler.php" class="flex-1">
-                <input type="hidden" name="story_id" id="delete-story-id">
-                <input type="hidden" name="action" value="delete">
-                <button type="submit" class="w-full py-2 text-sm font-semibold bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                    Delete
-                </button>
-            </form>
+            <!-- ✅ Simple GET redirect, no external file needed -->
+            <a id="delete-confirm-btn" href="#"
+               class="flex-1 py-2 text-sm font-semibold bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-center">
+                Delete
+            </a>
         </div>
     </div>
 </div>
@@ -264,7 +259,6 @@ function status_badge($status) {
 
     function filterStories(status) {
         currentFilter = status;
-        // Update tab styles
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById('tab-' + status).classList.add('active');
         applyFilters();
@@ -283,13 +277,12 @@ function status_badge($status) {
         });
     }
 
-    function confirmDelete(id) {
-        document.getElementById('delete-story-id').value = id;
-        document.getElementById('delete-modal').classList.remove('hidden');
-    }
+  function confirmDelete(id) {
+    document.getElementById('delete-confirm-btn').href = '?delete_id=' + id;
+    document.getElementById('delete-modal').classList.remove('hidden');
+}
 
     function closeDelete() {
         document.getElementById('delete-modal').classList.add('hidden');
     }
 </script>
-<?php require_once "../includes/theme.php"; ?>

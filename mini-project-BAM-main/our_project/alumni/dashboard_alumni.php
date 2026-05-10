@@ -1,4 +1,3 @@
-
 <?php
 include("../student/tools/userHeaderName.php"); 
 ?>
@@ -69,8 +68,7 @@ $accepted_count = (int)($accepted_count ?? 0);
 $unread_count   = (int)($unread_count   ?? 0);
 $story_views    = (int)($story_views    ?? 0);
 ?>
-<?php require_once "../includes/head.php"; ?>
-<!-- Lucide icons (loaded here so sidebar + topbar always have it) -->
+
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -93,18 +91,19 @@ $story_views    = (int)($story_views    ?? 0);
     .req-row:hover { background: #f8fafc; }
 </style>
 
-<div class="flex h-screen overflow-hidden bg-[#f5f6fa]">
+<!-- OUTER: full height column -->
+<div class="flex flex-col h-screen overflow-hidden bg-[#f5f6fa]">
 
-    <!-- SIDEBAR -->
-    <?php include 'sidebar_alumni.php'; ?>
+    <!-- TOPBAR — full width across the top -->
+    <?php include 'alumni_header.php'; ?>
 
-    <!-- MAIN -->
-    <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
+    <!-- BELOW TOPBAR: sidebar + content side by side -->
+    <div class="flex flex-1 overflow-hidden">
 
-        <!-- TOPBAR -->
-        <?php include '../student/tools/header.php'; ?>
+        <!-- SIDEBAR -->
+        <?php include 'sidebar_alumni.php'; ?>
 
-        <!-- CONTENT -->
+        <!-- MAIN CONTENT -->
         <div class="flex-1 overflow-y-auto">
             <div class="px-8 py-7 max-w-6xl mx-auto space-y-8">
 
@@ -301,9 +300,11 @@ $story_views    = (int)($story_views    ?? 0);
                 <p class="text-xs text-gray-300">Alumni Portal</p>
             </footer>
 
-        </div>
-    </div>
-</div>
+        </div><!-- closes main content -->
+
+    </div><!-- closes sidebar + content row -->
+
+</div><!-- closes outer column -->
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

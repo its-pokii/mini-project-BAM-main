@@ -173,9 +173,10 @@ $push_notif  = $user['push_notif']  ?? 0;
 <title>UCA Connect – Profile & Settings</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="font-sans bg-gray-100 h-screen flex flex-col">
 
-  <?php include("tools/header.php"); ?>
+  <?php include("alumni_header.php"); ?>
 
   <?php if ($success || $error): ?>
   <script>
@@ -201,17 +202,8 @@ $push_notif  = $user['push_notif']  ?? 0;
 
   <div class="flex flex-1 overflow-hidden">
 
-    <!-- SIDEBAR -->
-    <div class="w-56 border-r border-gray-200 flex flex-col justify-between py-6 bg-white flex-shrink-0">
-      <nav class="flex flex-col">
-        <a href="01-dashboard.php"   class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-900 border-r-4 border-transparent hover:bg-gray-100 no-underline transition-colors">Dashboard</a>
-        <a href="02-find-alumni.php" class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-900 border-r-4 border-transparent hover:bg-gray-100 no-underline transition-colors">Find Alumni</a>
-        <a href="04-connections.php" class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-900 border-r-4 border-transparent hover:bg-gray-100 no-underline transition-colors">Connections</a>
-        <a href="05-messages.php"    class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-900 border-r-4 border-transparent hover:bg-gray-100 no-underline transition-colors">Messages</a>
-        <a href="06-stories.php"     class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-900 border-r-4 border-transparent hover:bg-gray-100 no-underline transition-colors">Stories</a>
-      </nav>
-      <a href="settings.php" class="flex items-center gap-2.5 px-6 py-2.5 text-sm font-semibold text-blue-600 bg-blue-50 border-r-4 border-blue-600 no-underline">Profile &amp; Settings</a>
-    </div>
+        <!-- SIDEBAR -->
+        <?php include 'sidebar_alumni.php'; ?>
 
     <!-- MAIN -->
     <div class="flex-1 p-8 overflow-y-auto">
@@ -224,7 +216,7 @@ $push_notif  = $user['push_notif']  ?? 0;
 
           <div class="flex items-center gap-4 mb-6">
             <div class="w-16 h-16 rounded-full bg-gray-300 overflow-hidden flex-shrink-0">
-              <img id="photoPreview" src="<?= $photo_src ?>" alt="<?= $full_name ?>" class="w-full h-full object-cover" />
+              <img id="photoPreview" src="../student/<?= $photo_src ?>" alt="<?= $full_name ?>" class="w-full h-full object-cover" />
             </div>
             <div>
               <div class="font-semibold text-sm text-gray-900 mb-1"><?= $full_name ?></div>
@@ -378,7 +370,6 @@ $push_notif  = $user['push_notif']  ?? 0;
     </div>
   </div>
 
-  <?php include("tools/footer.php"); ?>
 
   <!-- TOAST -->
   <div id="toast" class="fixed bottom-6 right-6 bg-gray-900 text-white text-sm px-5 py-3 rounded-xl shadow-lg opacity-0 pointer-events-none transition-opacity duration-300">

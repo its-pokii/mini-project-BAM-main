@@ -5,6 +5,35 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     header("Location: ../login.php");
     exit;
 }
+
+require_once("../auth/config.php");
+
+// Fetch all approved stories with author info
+$stories = [];
+$stmt = $connector->prepare("
+    SELECT ss.id, ss.title, ss.content, ss.industry, ss.cover_photo, ss.created_at,
+           u.first_name, u.last_name, ap.current_position, ap.current_company
+    FROM success_stories ss
+    JOIN users u ON ss.author_id = u.id
+    LEFT JOIN alumni_profiles ap ON ss.author_id = ap.user_id
+    WHERE ss.status = 'approved'
+    ORDER BY ss.created_at DESC
+");
+$stmt->execute();
+$res = $stmt->get_result();
+while ($row = $res->fetch_assoc()) $stories[] = $row;
+$stmt->close();
+
+// Industry color map
+function industry_color($industry) {
+    return match($industry) {
+        'Tech'        => '#3B82F6',
+        'Finance'     => '#6366F1',
+        'Healthcare'  => '#EF4444',
+        'Education'   => '#F59E0B',
+        default       => '#10B981',
+    };
+}
 ?>
 
 <!DOCTYPE html>
@@ -17,10 +46,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
 </head>
 <body class="font-sans bg-gray-50 h-screen flex flex-col">
 
-  <!-- TOP BAR -->
-  <?php
-  include("tools/header.php");
-  ?>
+  <?php include("tools/header.php"); ?>
 
   <div class="flex flex-1 overflow-hidden">
 
@@ -33,7 +59,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
         <a href="05-messages.php"    class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-900 border-r-4 border-transparent hover:bg-gray-100 no-underline transition-colors">Messages</a>
         <a href="06-stories.php"     class="flex items-center gap-2.5 px-6 py-2.5 text-sm font-semibold text-blue-600 bg-blue-50 border-r-4 border-blue-600 no-underline">Stories</a>
       </nav>
-      <a href="settings.php" class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-500 no-underline">⚙️ Profile &amp; Settings</a>
+      <a href="settings.php" class="flex items-center gap-2.5 px-6 py-2.5 text-sm text-gray-500 no-underline">Profile &amp; Settings</a>
     </div>
 
     <!-- MAIN -->
@@ -51,66 +77,98 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
             class="border-none outline-none text-sm w-full bg-transparent"
           />
         </div>
-        <button class="bg-white text-gray-900 border border-gray-200 rounded-lg px-4 py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors">
-          🔽 Filter
-        </button>
       </div>
 
       <!-- STORIES GRID -->
-      <div id="storiesGrid" class="grid grid-cols-4 gap-5"></div>
+      <?php if (empty($stories)): ?>
+      <div class="flex flex-col items-center justify-center py-24 text-center">
+        <p class="text-4xl mb-4">📖</p>
+        <p class="text-sm font-medium text-gray-500">No stories published yet</p>
+        <p class="text-xs text-gray-400 mt-1">Check back soon for alumni success stories</p>
+      </div>
+      <?php else: ?>
+      <div id="storiesGrid" class="grid grid-cols-4 gap-5">
+        <?php foreach ($stories as $s):
+            $full_name  = htmlspecialchars($s['first_name'] . ' ' . $s['last_name']);
+            $initials   = strtoupper(substr($s['first_name'], 0, 1) . substr($s['last_name'], 0, 1));
+            $color      = industry_color($s['industry'] ?? '');
+            $excerpt    = htmlspecialchars(substr(strip_tags($s['content']), 0, 100)) . '...';
+            $subtitle   = $s['current_position'] && $s['current_company']
+                            ? htmlspecialchars($s['current_position'] . ' @ ' . $s['current_company'])
+                            : htmlspecialchars($full_name);
+        ?>
+        <div class="story-card bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col"
+             data-title="<?= strtolower(htmlspecialchars($s['title'])) ?>"
+             data-author="<?= strtolower($full_name) ?>"
+             data-desc="<?= strtolower($excerpt) ?>">
+
+          <?php if ($s['cover_photo']): ?>
+            <img src="../uploads/stories/<?= htmlspecialchars($s['cover_photo']) ?>"
+                 alt="<?= htmlspecialchars($s['title']) ?>"
+                 loading="lazy"
+                 class="w-full h-36 object-cover block" />
+          <?php else: ?>
+            <div class="w-full h-36 flex items-center justify-center text-white text-3xl font-bold"
+                 style="background: <?= $color ?>">
+              <?= $initials ?>
+            </div>
+          <?php endif; ?>
+
+          <div class="p-4 flex-1 flex flex-col">
+            <div class="text-sm font-bold text-gray-900 mb-2 leading-snug">
+              <?= htmlspecialchars($s['title']) ?>
+            </div>
+            <div class="text-xs text-gray-500 leading-relaxed flex-1 mb-3">
+              <?= $excerpt ?>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
+                     style="font-size:9px; background:<?= $color ?>">
+                  <?= $initials ?>
+                </div>
+                <span class="text-xs text-gray-500"><?= $subtitle ?></span>
+              </div>
+              <a href="view-story.php?id=<?= (int)$s['id'] ?>"
+                 class="bg-white text-gray-900 border border-gray-200 rounded-lg px-2.5 py-1 text-xs cursor-pointer hover:bg-gray-50 transition-colors no-underline">
+                View Story
+              </a>
+            </div>
+          </div>
+        </div>
+        <?php endforeach; ?>
+      </div>
+
+      <!-- Empty state when search returns nothing -->
+      <div id="no-results" class="hidden flex-col items-center justify-center py-16 text-center">
+        <p class="text-3xl mb-3">🔍</p>
+        <p class="text-sm text-gray-400">No stories match your search</p>
+      </div>
+      <?php endif; ?>
+
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <?php 
-  include("tools/footer.php");
-  ?>
+  <?php include("tools/footer.php"); ?>
 
 <script>
-const stories = [
-  { title: "From UCA to Silicon Valley: My Journey as a Software Engineer",   author: "Ahmed El Kabbaj", desc: "Discover how a UCA alumnus leveraged his skills to land a dream job at a leading tech company in Silicon Valley.", img: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80", color: "#3B82F6" },
-  { title: "Building a Sustainable Future: My Startup Journey",                author: "Fatima Zahraoui",  desc: "Learn about the challenges and triumphs of a UCA graduate who founded a successful green technology startup.",  img: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=600&q=80", color: "#10B981" },
-  { title: "Impact in Public Service: A Career in Diplomacy",                  author: "Youssef Bensaid", desc: "A UCA International Relations alumna shares her experiences working in diplomacy, advocating for change on the world stage.", img: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80", color: "#F59E0B" },
-  { title: "Innovation in Healthcare: Developing New Medical Devices",         author: "Sara Kettani",    desc: "A UCA Biomedical Engineering graduate discusses her role in pioneering medical devices that save lives.", img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=600&q=80", color: "#EF4444" },
-  { title: "Mastering the Markets: A Career in Investment Banking",            author: "Omar Benjelloun", desc: "Explore the high-stakes world of investment banking with a UCA Finance alumnus, who shares tips for breaking in.", img: "https://images.unsplash.com/photo-1642790551116-18e150f248e5?w=600&q=80", color: "#6366F1" },
-  { title: "Crafting Experiences: My Path in Digital Product Design",          author: "Nadia Cherkaoui", desc: "Follow the creative journey of a UCA Design alumna who is now shaping user experiences for millions of people.", img: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=80", color: "#EC4899" },
-];
-
-function initials(name) { return name.split(' ').map(n => n[0]).join('').slice(0, 2); }
-
-function renderStories(list) {
-  document.getElementById('storiesGrid').innerHTML = list.map(s => `
-    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col">
-      <img src="${s.img}" alt="${s.title}" loading="lazy" class="w-full h-36 object-cover block" />
-      <div class="p-4 flex-1 flex flex-col">
-        <div class="text-sm font-bold text-gray-900 mb-2 leading-snug">${s.title}</div>
-        <div class="text-xs text-gray-500 leading-relaxed flex-1 mb-3">${s.desc}</div>
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-1.5">
-            <div class="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
-                 style="font-size:9px; background:${s.color}">${initials(s.author)}</div>
-            <span class="text-xs text-gray-500">${s.author}</span>
-          </div>
-          <button class="bg-white text-gray-900 border border-gray-200 rounded-lg px-2.5 py-1 text-xs cursor-pointer hover:bg-gray-50 transition-colors">
-            View Story
-          </button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
 function filterStories() {
-  const q = document.getElementById('storySearch').value.toLowerCase();
-  const filtered = stories.filter(s =>
-    s.title.toLowerCase().includes(q) ||
-    s.author.toLowerCase().includes(q) ||
-    s.desc.toLowerCase().includes(q)
-  );
-  renderStories(filtered);
-}
+    const q = document.getElementById('storySearch').value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.story-card');
+    let visible = 0;
 
-renderStories(stories);
+    cards.forEach(card => {
+        const match = !q
+            || card.dataset.title.includes(q)
+            || card.dataset.author.includes(q)
+            || card.dataset.desc.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+
+    const noResults = document.getElementById('no-results');
+    if (noResults) noResults.classList.toggle('hidden', visible > 0);
+}
 </script>
 </body>
 </html>
