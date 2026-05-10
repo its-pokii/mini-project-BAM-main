@@ -78,7 +78,7 @@ $unread_count  = (int)($unread_count  ?? 0);
 function photo_src($photo) {
     $p = trim($photo ?? '');
     if (empty($p)) return '';
-    return '../' . htmlspecialchars(ltrim($p, './\\'));
+    return '../student/' . htmlspecialchars(ltrim($p, './\\'));
 }
 ?>
 <?php require_once "../includes/head.php"; ?>
@@ -150,7 +150,7 @@ function photo_src($photo) {
                             <div class="w-11 h-11 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center text-blue-600 font-bold text-sm shrink-0"
                                  data-initials="<?= $initials ?>">
                                 <?php if ($photo): ?>
-                                    <img src="<?= $photo ?>" class="w-full h-full object-cover"
+                                    <img src="../student/<?= $photo ?>" class="w-full h-full object-cover"
                                          onerror="this.parentElement.textContent=this.parentElement.dataset.initials">
                                 <?php else: ?><?= $initials ?><?php endif; ?>
                             </div>
@@ -221,7 +221,7 @@ function photo_src($photo) {
                             <div class="w-16 h-16 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center text-blue-600 font-bold text-xl mb-3"
                                  data-initials="<?= $initials ?>">
                                 <?php if ($photo): ?>
-                                    <img src="<?= $photo ?>" class="w-full h-full object-cover"
+                                    <img src="../student/<?= $photo ?>" class="w-full h-full object-cover"
                                          onerror="this.parentElement.textContent=this.parentElement.dataset.initials">
                                 <?php else: ?><?= $initials ?><?php endif; ?>
                             </div>
@@ -265,4 +265,3 @@ function photo_src($photo) {
         if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 </script>
-<?php require_once "../includes/theme.php"; ?>

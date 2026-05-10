@@ -375,32 +375,15 @@ $push_notif  = $user['push_notif']  ?? 0;
         </button>
       </section>
 
-    </div>
-  </div>
-
-  <?php include("tools/footer.php"); ?>
-
-  <!-- TOAST -->
-  <div id="toast" class="fixed bottom-6 right-6 bg-gray-900 text-white text-sm px-5 py-3 rounded-xl shadow-lg opacity-0 pointer-events-none transition-opacity duration-300">
-    ✅ Changes saved
-  </div>
-
-  <!-- DELETE CONFIRM MODAL -->
-  <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-xl p-6 w-full max-w-sm shadow-2xl">
-      <h3 class="text-base font-bold text-gray-900 mb-2">Delete Account</h3>
-      <p class="text-sm text-gray-500 mb-5">Are you sure? This will permanently delete your account and all your data. This cannot be undone.</p>
-      <div class="flex gap-3">
-        <button onclick="closeModal()" class="flex-1 bg-white text-gray-900 border border-gray-200 rounded-lg py-2 text-sm cursor-pointer hover:bg-gray-50 transition-colors">Cancel</button>
-        <form method="POST" class="flex-1">
-          <button type="submit" name="delete_account"
-            class="w-full bg-red-600 hover:bg-red-700 text-white border-none rounded-lg py-2 text-sm font-semibold cursor-pointer transition-colors">
-            Yes, Delete
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
+      <!-- LOG OUT -->
+      <section class="bg-white border border-gray-200 rounded-xl p-6 mt-6">
+        <h2 class="text-base font-bold text-gray-900 mb-4">Session</h2>
+        <p class="text-sm text-gray-500 mb-4">Sign out of your UCA Connect account on this device.</p>
+        <a href="../login.php"
+           class="inline-block bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-semibold px-5 py-2 rounded-lg transition-colors no-underline">
+          Log Out
+        </a>
+      </section>
 
 <script>
   const toggleStates = {

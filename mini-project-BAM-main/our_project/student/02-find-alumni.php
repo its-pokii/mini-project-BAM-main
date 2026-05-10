@@ -118,7 +118,7 @@ function renderAlumni(list) {
 
       <!-- avatar: use photo if exists, otherwise colored initials -->
       ${a.profile_photo
-        ? `<img src="../uploads/${a.profile_photo}" 
+        ? `<img src="${a.profile_photo}" 
                 class="w-14 h-14 rounded-full object-cover mx-auto mb-3" />`
         : `<div class="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto mb-3" 
                 style="background:${colors[index % colors.length]}">

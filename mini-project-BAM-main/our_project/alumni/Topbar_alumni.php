@@ -1,10 +1,11 @@
 <?php
-$_photo_raw = trim($display_photo ?? $profile_photo ?? '');
+$_photo_raw = trim($profile_photo ?? $display_photo ?? '');
 if (!empty($_photo_raw)) {
+    // Strip any accidental leading slashes or ../
     $_photo_clean = ltrim($_photo_raw, './\\');
-    $topbar_photo_src = '../' . htmlspecialchars($_photo_clean);
+    $sidebar_photo_src = '../' . htmlspecialchars($_photo_clean);
 } else {
-    $topbar_photo_src = '';
+    $sidebar_photo_src = '';
 }
 ?>
 <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-end px-6 shrink-0">

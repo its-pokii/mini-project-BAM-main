@@ -8,11 +8,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
 
 require_once("../auth/config.php");
 
-// Fetch all approved stories with author info
 $stories = [];
 $stmt = $connector->prepare("
     SELECT ss.id, ss.title, ss.content, ss.industry, ss.cover_photo, ss.created_at,
-           u.first_name, u.last_name, ap.current_position, ap.current_company
+           u.first_name, u.last_name, u.profile_photo,
+           ap.current_position, ap.current_company
     FROM success_stories ss
     JOIN users u ON ss.author_id = u.id
     LEFT JOIN alumni_profiles ap ON ss.author_id = ap.user_id
@@ -24,7 +24,6 @@ $res = $stmt->get_result();
 while ($row = $res->fetch_assoc()) $stories[] = $row;
 $stmt->close();
 
-// Industry color map
 function industry_color($industry) {
     return match($industry) {
         'Tech'        => '#3B82F6',
@@ -69,7 +68,6 @@ function industry_color($industry) {
       <!-- SEARCH ROW -->
       <div class="flex gap-3 mb-6">
         <div class="flex-1 flex items-center bg-white border border-gray-200 rounded-lg px-3 py-2 gap-2">
-          <span class="text-gray-400">🔍</span>
           <input
             id="storySearch"
             oninput="filterStories()"
@@ -79,10 +77,8 @@ function industry_color($industry) {
         </div>
       </div>
 
-      <!-- STORIES GRID -->
       <?php if (empty($stories)): ?>
       <div class="flex flex-col items-center justify-center py-24 text-center">
-        <p class="text-4xl mb-4">📖</p>
         <p class="text-sm font-medium text-gray-500">No stories published yet</p>
         <p class="text-xs text-gray-400 mt-1">Check back soon for alumni success stories</p>
       </div>
@@ -103,7 +99,7 @@ function industry_color($industry) {
              data-desc="<?= strtolower($excerpt) ?>">
 
           <?php if ($s['cover_photo']): ?>
-            <img src="../uploads/stories/<?= htmlspecialchars($s['cover_photo']) ?>"
+            <img src="../<?= htmlspecialchars($s['cover_photo']) ?>"
                  alt="<?= htmlspecialchars($s['title']) ?>"
                  loading="lazy"
                  class="w-full h-36 object-cover block" />
@@ -123,10 +119,15 @@ function industry_color($industry) {
             </div>
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-1.5">
-                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
-                     style="font-size:9px; background:<?= $color ?>">
-                  <?= $initials ?>
-                </div>
+                <?php if ($s['profile_photo']): ?>
+                  <img src="../<?= htmlspecialchars($s['profile_photo']) ?>"
+                       class="w-6 h-6 rounded-full object-cover flex-shrink-0" />
+                <?php else: ?>
+                  <div class="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
+                       style="font-size:9px; background:<?= $color ?>">
+                    <?= $initials ?>
+                  </div>
+                <?php endif; ?>
                 <span class="text-xs text-gray-500"><?= $subtitle ?></span>
               </div>
               <a href="view-story.php?id=<?= (int)$s['id'] ?>"
@@ -139,9 +140,7 @@ function industry_color($industry) {
         <?php endforeach; ?>
       </div>
 
-      <!-- Empty state when search returns nothing -->
       <div id="no-results" class="hidden flex-col items-center justify-center py-16 text-center">
-        <p class="text-3xl mb-3">🔍</p>
         <p class="text-sm text-gray-400">No stories match your search</p>
       </div>
       <?php endif; ?>

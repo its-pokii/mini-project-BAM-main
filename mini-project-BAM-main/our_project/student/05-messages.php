@@ -41,7 +41,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
       <div class="px-4 pt-5 pb-3">
         <h2 class="text-lg font-bold text-gray-900 mb-3">Messages</h2>
         <div class="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 gap-2 mb-3">
-          <span class="text-gray-400">🔍</span>
           <input id="searchInput" class="border-none bg-transparent outline-none text-sm w-full" placeholder="Search conversations..." />
         </div>
         <div class="flex gap-2" id="tabsContainer">
@@ -174,7 +173,7 @@ function renderConvos() {
                 ${c.user_id == selectedConvo ? 'bg-blue-50' : 'hover:bg-gray-50'}">
 
       ${c.profile_photo
-        ? `<img src="${escapeHTML(c.profile_photo)}" class="w-10 h-10 rounded-full object-cover"/>`
+        ? `<img src="../${escapeHTML(c.profile_photo)}" class="w-10 h-10 rounded-full object-cover"/>`
         : `<div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
                 style="background:${getColor(i)}">
              ${initials(c.first_name + ' ' + c.last_name)}
@@ -220,7 +219,7 @@ function selectConvo(userId, colorIndex) {
   const avatar = document.getElementById('chatAvatar');
 
   if (c.profile_photo) {
-    avatar.innerHTML = `<img src="${escapeHTML(c.profile_photo)}" class="w-10 h-10 rounded-full object-cover"/>`;
+    avatar.innerHTML = `<img src="../${escapeHTML(c.profile_photo)}" class="w-10 h-10 rounded-full object-cover"/>`;
     avatar.style.background = 'transparent';
   } else {
     avatar.textContent = initials(c.first_name + ' ' + c.last_name);

@@ -31,6 +31,20 @@ mysqli_execute($stmt4);
 $result4 = mysqli_stmt_get_result($stmt4);
 $pending_requests_count = mysqli_fetch_column($result4);
 
+$stmt5 = mysqli_prepare($connector, "
+    SELECT ss.id, ss.title, ss.content, ss.cover_photo, ss.industry,
+           u.first_name, u.last_name, u.profile_photo,
+           ap.current_position, ap.current_company
+    FROM success_stories ss
+    JOIN users u ON ss.author_id = u.id
+    LEFT JOIN alumni_profiles ap ON ss.author_id = ap.user_id
+    WHERE ss.status = 'approved'
+    ORDER BY ss.created_at DESC
+    LIMIT 3
+");
+mysqli_execute($stmt5);
+$featured_stories = mysqli_stmt_get_result($stmt5);
+
 ?>
 
 
@@ -99,38 +113,48 @@ $pending_requests_count = mysqli_fetch_column($result4);
       </div>
 
       <!-- FEATURED STORIES -->
-      <h2 class="text-base font-semibold mb-4">Featured Stories</h2>
-      <div class="grid grid-cols-3 gap-5">
-
-        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" alt="John Doe" class="w-full h-40 object-cover block" />
-          <div class="p-4">
-            <h3 class="text-sm font-semibold mb-1.5">From Campus to CEO: John Doe's Journey</h3>
-            <p class="text-xs text-gray-500 mb-1.5">John Doe</p>
-            <p class="text-xs text-gray-500 leading-relaxed mb-3">John Doe, a UCA alumnus, shares his inspiring path from student life to leading a successful tech startup, emphasizing resilience and determination.</p>
-            <a href="06-stories.html" class="bg-white text-gray-900 border border-gray-200 rounded-lg px-3.5 py-1.5 text-xs cursor-pointer no-underline hover:bg-gray-50 transition-colors">View Story</a>
-          </div>
+      <!-- FEATURED STORIES -->
+<h2 class="text-base font-semibold mb-4">Featured Stories</h2>
+<?php
+$stories_list = mysqli_fetch_all($featured_stories, MYSQLI_ASSOC);
+if (empty($stories_list)):
+?>
+<div class="flex flex-col items-center justify-center py-12 text-center bg-white border border-gray-200 rounded-xl">
+    <p class="text-3xl mb-3">📖</p>
+    <p class="text-sm text-gray-400">No stories published yet</p>
+</div>
+<?php else: ?>
+<div class="grid grid-cols-3 gap-5">
+    <?php foreach ($stories_list as $s):
+        $full_name = htmlspecialchars($s['first_name'] . ' ' . $s['last_name']);
+        $excerpt   = htmlspecialchars(substr(strip_tags($s['content']), 0, 120)) . '...';
+        $meta      = $s['current_position'] && $s['current_company']
+                       ? htmlspecialchars($s['current_position'] . ' @ ' . $s['current_company'])
+                       : $full_name;
+    ?>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <?php if ($s['cover_photo']): ?>
+            <img src="../<?= htmlspecialchars($s['cover_photo']) ?>"
+                 alt="<?= htmlspecialchars($s['title']) ?>"
+                 class="w-full h-40 object-cover block" />
+        <?php else: ?>
+            <div class="w-full h-40 bg-blue-100 flex items-center justify-center text-blue-400 text-4xl font-bold">
+                <?= strtoupper(substr($s['first_name'], 0, 1) . substr($s['last_name'], 0, 1)) ?>
+            </div>
+        <?php endif; ?>
+        <div class="p-4">
+            <h3 class="text-sm font-semibold mb-1.5 leading-snug"><?= htmlspecialchars($s['title']) ?></h3>
+            <p class="text-xs text-gray-500 mb-1.5"><?= $meta ?></p>
+            <p class="text-xs text-gray-500 leading-relaxed mb-3"><?= $excerpt ?></p>
+            <a href="view-story.php?id=<?= (int)$s['id'] ?>"
+               class="bg-white text-gray-900 border border-gray-200 rounded-lg px-3.5 py-1.5 text-xs cursor-pointer no-underline hover:bg-gray-50 transition-colors">
+               View Story
+            </a>
         </div>
-
-        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&q=80" alt="Sarah Lee" class="w-full h-40 object-cover block" />
-          <div class="p-4">
-            <h3 class="text-sm font-semibold mb-1.5">Empowering Futures: Sarah Lee's Mentorship Impact</h3>
-            <p class="text-xs text-gray-500 mb-1.5">Sarah Lee</p>
-            <p class="text-xs text-gray-500 leading-relaxed mb-3">Discover how Sarah Lee, a dedicated UCA graduate, is making a difference through her mentorship program, guiding current students.</p>
-            <a href="06-stories.html" class="bg-white text-gray-900 border border-gray-200 rounded-lg px-3.5 py-1.5 text-xs cursor-pointer no-underline hover:bg-gray-50 transition-colors">View Story</a>
-          </div>
-        </div>
-
-        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&q=80" alt="Mark Chen" class="w-full h-40 object-cover block" />
-          <div class="p-4">
-            <h3 class="text-sm font-semibold mb-1.5">Innovation in Industry: Mark Chen's Breakthrough Research</h3>
-            <p class="text-xs text-gray-500 mb-1.5">Mark Chen</p>
-            <p class="text-xs text-gray-500 leading-relaxed mb-3">Alumnus Mark Chen discusses his groundbreaking research in sustainable energy and its real-world applications.</p>
-            <a href="06-stories.html" class="bg-white text-gray-900 border border-gray-200 rounded-lg px-3.5 py-1.5 text-xs cursor-pointer no-underline hover:bg-gray-50 transition-colors">View Story</a>
-          </div>
-        </div>
+    </div>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
 
       </div>
     </div>

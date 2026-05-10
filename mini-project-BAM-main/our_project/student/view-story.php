@@ -92,7 +92,7 @@ $color = industry_color($story['industry'] ?? '');
       <!-- Cover -->
       <?php if ($story['cover_photo']): ?>
         <div class="w-full h-56 overflow-hidden">
-          <img src="../uploads/stories/<?= htmlspecialchars($story['cover_photo']) ?>"
+          <img src="../../<?= htmlspecialchars($story['cover_photo'])  ?>"
                alt="Cover"
                class="w-full h-full object-cover" />
         </div>
@@ -128,7 +128,7 @@ $color = industry_color($story['industry'] ?? '');
         <!-- Author card -->
         <div class="flex items-center gap-3 mb-8 pb-6 border-b border-gray-100">
           <?php if ($story['profile_photo']): ?>
-            <img src="../uploads/profiles/<?= htmlspecialchars($story['profile_photo']) ?>"
+            <img src="<?= htmlspecialchars($story['profile_photo']) ?>"
                  class="w-11 h-11 rounded-full object-cover" />
           <?php else: ?>
             <div class="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"

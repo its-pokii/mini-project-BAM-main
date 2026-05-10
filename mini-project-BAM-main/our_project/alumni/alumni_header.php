@@ -4,14 +4,13 @@
       UCA Connect
     </div>
     <div class="flex-1 max-w-sm mx-6 flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 gap-2">
-      <!-- <span class="text-gray-400">🔍</span> -->
       <input class="border-none bg-transparent outline-none text-sm w-full" placeholder="Search..." />
     </div>
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-2">
         <?php if (!empty($user['profile_photo'])): ?>
     <img 
-        src="../student/<?= htmlspecialchars($user['profile_photo']) ?>"
+        src="../<?= htmlspecialchars($user['profile_photo']) ?>"
         alt="Profile Photo"
         class="w-12 h-12 rounded-full object-cover"
     />

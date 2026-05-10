@@ -205,20 +205,26 @@ $story_views    = (int)($story_views    ?? 0);
                                 </div>
                                 <!-- Actions -->
                                 <div class="flex gap-2 shrink-0">
+                                   <form method="POST" action="connection-handler.php">
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+    <input type="hidden" name="connection_id" value="<?= (int)$req['connection_id'] ?>">
+    <input type="hidden" name="action" value="decline">
+
+    <button type="submit"
+        class="px-4 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+        Decline
+    </button>
+</form>
                                     <form method="POST" action="connection-handler.php">
-                                        <input type="hidden" name="connection_id" value="<?= (int)$req['connection_id'] ?>">
-                                        <input type="hidden" name="action" value="decline">
-                                        <button type="submit" class="px-4 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
-                                            Decline
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="connection-handler.php">
-                                        <input type="hidden" name="connection_id" value="<?= (int)$req['connection_id'] ?>">
-                                        <input type="hidden" name="action" value="accept">
-                                        <button type="submit" class="px-4 py-1.5 text-xs font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                            Accept
-                                        </button>
-                                    </form>
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+    <input type="hidden" name="connection_id" value="<?= (int)$req['connection_id'] ?>">
+    <input type="hidden" name="action" value="accept">
+
+    <button type="submit"
+        class="px-4 py-1.5 text-xs font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        Accept
+    </button>
+</form>
                                 </div>
                             </div>
                             <?php endforeach; ?>
