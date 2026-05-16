@@ -92,11 +92,6 @@ $unread_count  = (int)($unread_count  ?? 0);
                 </div>
 
                 <!-- NEW MESSAGE BTN -->
-                <div class="p-4 border-t border-gray-200">
-                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white border-none rounded-lg py-2.5 text-sm font-semibold cursor-pointer transition-colors">
-                        + Start New Message
-                    </button>
-                </div>
             </div>
 
             <!-- CHAT PANEL -->

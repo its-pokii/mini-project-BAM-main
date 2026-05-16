@@ -328,40 +328,7 @@ $push_notif  = $user['push_notif']  ?? 0;
         </form>
       </section>
 
-      <!-- NOTIFICATION PREFERENCES -->
-      <section class="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-        <h2 class="text-base font-bold text-gray-900 mb-5">Notification Preferences</h2>
-        <form method="POST">
-          <div class="flex items-center justify-between py-3 border-b border-gray-100">
-            <div>
-              <div class="text-sm font-semibold text-gray-900">Email Notifications</div>
-              <div class="text-xs text-gray-500 mt-0.5">Receive updates and alerts via email.</div>
-            </div>
-            <button type="button" id="emailToggle" onclick="toggleSwitch('emailToggle', 'emailHidden')"
-              class="relative w-11 h-6 rounded-full transition-colors duration-200 <?= $email_notif ? 'bg-blue-600' : 'bg-gray-300' ?> focus:outline-none">
-              <span class="absolute top-0.5 <?= $email_notif ? 'left-5' : 'left-0.5' ?> w-5 h-5 bg-white rounded-full shadow transition-all duration-200"></span>
-            </button>
-            <input type="hidden" name="email_notif" id="emailHidden" value="<?= $email_notif ? '1' : '0' ?>" />
-          </div>
-          <div class="flex items-center justify-between py-3">
-            <div>
-              <div class="text-sm font-semibold text-gray-900">Push Notifications</div>
-              <div class="text-xs text-gray-500 mt-0.5">Receive real-time alerts on your device.</div>
-            </div>
-            <button type="button" id="pushToggle" onclick="toggleSwitch('pushToggle', 'pushHidden')"
-              class="relative w-11 h-6 rounded-full transition-colors duration-200 <?= $push_notif ? 'bg-blue-600' : 'bg-gray-300' ?> focus:outline-none">
-              <span class="absolute top-0.5 <?= $push_notif ? 'left-5' : 'left-0.5' ?> w-5 h-5 bg-white rounded-full shadow transition-all duration-200"></span>
-            </button>
-            <input type="hidden" name="push_notif" id="pushHidden" value="<?= $push_notif ? '1' : '0' ?>" />
-          </div>
-          <div class="flex justify-end mt-4">
-            <button type="submit" name="save_prefs"
-              class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2 rounded-lg border-none cursor-pointer transition-colors">
-              Save Preferences
-            </button>
-          </div>
-        </form>
-      </section>
+     
 
       <!-- DELETE ACCOUNT -->
       <section class="bg-white border border-gray-200 rounded-xl p-6">

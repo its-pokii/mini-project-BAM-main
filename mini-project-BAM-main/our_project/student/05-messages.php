@@ -56,11 +56,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
       </div>
 
       <!-- NEW MESSAGE BTN -->
-      <div class="p-4 border-t border-gray-200">
-        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white border-none rounded-lg py-2.5 text-sm font-semibold cursor-pointer transition-colors">
-          + Start New Message
-        </button>
-      </div>
     </div>
 
     <!-- CHAT PANEL -->
