@@ -7,24 +7,21 @@
             </div>
             <div class="hover:text-primary flex gap-2 items-center">
                 <i class="mr-2 text-xl fa-solid fa-users"></i>
-                <a href="dashboard.php">Alumni Approvals</a>
+                <a href="alumni-approvals.php">Alumni Approvals</a>
             </div>
             <div class="hover:text-primary flex gap-2 items-center">
                 <i class="mr-2 text-xl fa-solid fa-book-open"></i>
-                <a href="dashboard.php">Story Approvals</a>
+                <a href="story-approvals.php">Story Approvals</a>
             </div>
             <div class="hover:text-primary flex gap-2 items-center">
                 <i class="mr-2 text-xl fa-solid fa-chart-simple"></i>
-                <a href="dashboard.php">Stats</a>
+                <a href="stats.php">Stats</a>
             </div>
         </div>
     </div>
     <div>
         <div class="px-8 py-3 flex flex-col justify-between h-[20%]">
-            <div class="hover:text-primary flex gap-2 items-center">
-                <i class="mr-2 text-md fa-solid fa-gear"></i>
-                <a href="dashboard.php">Settings</a>
-            </div>
+            
         </div>
     </div>
 </aside>
